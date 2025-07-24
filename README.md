@@ -51,22 +51,34 @@ Although the reference implementation targets “amount-excluding-tax” extract
 ## 4. Directory layout
 
 ```
-dspy_optimizer/
-├── invoice_amount_optimizer.py      # Reference implementation
-├── core/
-│   ├── optimizer.py                 # Generic Optimiser class
-│   ├── evaluator.py                 # Evaluator module
-│   ├── refiner.py                   # Refiner module
-│   ├── merger.py                    # Merger module
-│   └── scoring.py                   # Pluggable scorers
-├── examples/
-│   └── dutch_invoices/              # Example dataset & scripts
-├── notebooks/
-│   └── develop.ipynb                # Example notebooks for development
-├── data/                            # Example datasets
-│   └── invoices/                    # Example invoices dataset
-├── tests/                           # Unit & integration tests
-└── README.md                        # ← you are here
+dspy_optimizer/           # The main library source code
+├── __init__.py           # Exposes public API
+├── optimizer.py          # The main PromptOptimiser class
+├── evaluator.py          # The Evaluator module
+├── refiner.py            # The Refiner module
+├── models.py             # Data models: PromptPatch, Config, etc.
+└── strategies/           # A dedicated home for all pluggable strategies
+    ├── __init__.py
+    ├── registry.py     # The registry object and decorators
+    ├── merger/
+    │   ├── base.py       # MergerStrategy interface
+    │   └── block_based.py
+    ├── validation/
+    │   ├── base.py       # ValidationStrategy interface
+    │   ├── full.py
+    │   └── batched.py
+    └── scoring/
+        ├── base.py       # Scorer function type definition
+        └── common.py     # Common scorers (numeric, exact_match)
+
+examples/                 # Top-level directory for examples
+└── dutch_invoices/
+    ├── optimize.py       # The script to run the invoice optimization
+    ├── dataset.py        # Logic for loading and preparing the data
+    └── data/             # The actual invoice data
+
+notebooks/                # Top-level, as before
+tests/                    # Top-level, as before
 ```
 
 ---
@@ -122,3 +134,44 @@ The optimiser will reuse the same evaluator/refiner/merger logic; only the I/O s
 
 
 ### Happy automating your prompt engineering 🚀
+
+
+---
+
+## 7. Project Roadmap
+
+This project will be developed iteratively. Here is the planned roadmap.
+
+### Core MVP (v0.1)
+
+The initial version will focus on delivering a fully functional, robust, and extensible optimization framework.
+
+- [ ] **Foundations:**
+    - [ ] Implement the core directory structure.
+    - [ ] Define all data models (`PromptPatch`, `Config`) and strategy interfaces (`ValidationStrategy`, `MergerStrategy`, `Callback`).
+    - [ ] Implement the decorator-based `Registry` for auto-discovery.
+- [ ] **Core Components:**
+    - [ ] Implement the `Evaluator`, `Refiner`, and `PromptOptimiser` orchestrator.
+    - [ ] Implement the default `BlockBasedMerger`.
+    - [ ] Implement the `FullValidationStrategy` and `BatchedTrainingSetValidationStrategy`.
+    - [ ] Implement a default `HistoryCallback` for auditing.
+- [ ] **Usability & Quality:**
+    - [ ] Provide a complete, working example for the Dutch Invoices use case.
+    - [ ] Write comprehensive docstrings and type hints for the public API.
+    - [ ] Achieve high unit test coverage with `pytest`.
+
+### Future Enhancements (Post-v0.1)
+
+Once the core is stable, we will explore more advanced features.
+
+- [ ] **Advanced Strategies:**
+    - [ ] Implement an `LLMPoweredMerger`.
+    - [ ] Implement a `CanarySetValidationStrategy`.
+    - [ ] Implement an `LLMAsJudgeValidationStrategy` for subjective tasks.
+- [ ] **Integrations:**
+    - [ ] Add a built-in `MLflowCallback` for seamless experiment tracking.
+    - [ ] Add a built-in `WandbCallback`.
+- [ ] **Developer Experience:**
+    - [ ] Develop a more expressive, `dplyr`-style composable API for defining optimization pipelines.
+- [ ] **Performance:**
+    - [ ] Investigate performance optimizations for the validation loop.

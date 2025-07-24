@@ -1,0 +1,43 @@
+[project]
+name = "dspy-optimizer"
+version = "0.1.0"
+description = "DSPy Prompt Optimizer"
+readme = "README.md"
+authors = [
+    { name = "Niels van Galen Last", email = "nvangalenlast@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "attachments>=0.21.0",
+    "dspy>=2.6.27",
+    "pytesseract>=0.3.13",
+]
+
+[project.scripts]
+dspy-optimizer = "dspy_optimizer:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "jupyterlab>=4.4.5",
+    "pre-commit>=4.2.0",
+    "ruff>=0.12.4",
+]
+
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true

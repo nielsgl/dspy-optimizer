@@ -4,22 +4,27 @@ import dspy
 
 
 class Evaluator(dspy.Module):
-    """A module for evaluating a prompt against a given signature."""
+    """A module for evaluating a prompt against a given signature.
 
-    def __init__(self, signature: type[dspy.Signature]):
+    This module is designed to be thread-safe, allowing for parallel execution
+    of the evaluation logic.
+    """
+
+    def __init__(self, signature: type[dspy.Signature], callbacks: list | None = None) -> None:
         """Initializes the Evaluator.
 
         Args:
-            signature: The DSPy signature to use for evaluation.
+            signature: The DSPy signature class to use for evaluation.
         """
-        super().__init__()
-        self.predictor = dspy.ChainOfThought(signature)
+        super().__init__(callbacks)
+        self._base_signature = signature
 
     def forward(self, prompt: str, **kwargs) -> dspy.Prediction:
-        """Evaluates the prompt with the given arguments.
+        """Evaluates the prompt with the given arguments in a thread-safe manner.
 
-        This method dynamically sets the instructions on the predictor's signature
-        before calling it.
+        This method uses the official `with_instructions` API to create a new,
+        temporary signature for each call. This is the correct, stateless,
+        and thread-safe way to use dynamic prompts in DSPy.
 
         Args:
             prompt: The prompt instructions to use for this evaluation.
@@ -28,15 +33,11 @@ class Evaluator(dspy.Module):
         Returns:
             A dspy.Prediction object containing the model's output.
         """
+        # Use the official, immutable API to create a new signature with the
+        # desired instructions. This is thread-safe and robust.
+        dynamic_signature = self._base_signature.with_instructions(prompt)
 
-        # Create a new signature class with the updated prompt
-        class DynamicSignature(self.predictor.signature):
-            """{prompt}"""
+        # Instantiate a predictor with the new, temporary signature.
+        predictor = dspy.ChainOfThought(dynamic_signature)
 
-            pass
-
-        DynamicSignature.__doc__ = DynamicSignature.__doc__.format(prompt=prompt)
-
-        self.predictor.predict.signature = DynamicSignature
-
-        return self.predictor(**kwargs)
+        return predictor(**kwargs)

@@ -146,12 +146,14 @@ This project will be developed iteratively. Here is the planned roadmap.
 
 The initial version will focus on delivering a fully functional, robust, and extensible optimization framework.
 
-- [ ] **Foundations:**
-    - [ ] Implement the core directory structure.
-    - [ ] Define all data models (`PromptPatch`, `Config`) and strategy interfaces (`ValidationStrategy`, `MergerStrategy`, `Callback`).
-    - [ ] Implement the decorator-based `Registry` for auto-discovery.
+- [x] **Foundations:**
+    - [x] Implement the core directory structure.
+    - [x] Define all data models (`PromptPatch`, `Config`) and strategy interfaces (`ValidationStrategy`, `MergerStrategy`, `Callback`).
+    - [x] Implement the decorator-based `Registry` for auto-discovery.
 - [ ] **Core Components:**
-    - [ ] Implement the `Evaluator`, `Refiner`, and `PromptOptimiser` orchestrator.
+    - [x] Implement the `Evaluator` module.
+    - [x] Implement the `Refiner` module.
+    - [ ] Implement the `PromptOptimiser` orchestrator.
     - [ ] Implement the default `BlockBasedMerger`.
     - [ ] Implement the `FullValidationStrategy` and `BatchedTrainingSetValidationStrategy`.
     - [ ] Implement a default `HistoryCallback` for auditing.

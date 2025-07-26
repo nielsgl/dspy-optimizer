@@ -1,6 +1,7 @@
 """Integration tests for the PromptOptimizer."""
 
 import dspy
+import pytest
 
 from dspy_optimizer.optimizer import PromptOptimizer
 from dspy_optimizer.strategies.scoring.common import exact_match_scorer
@@ -58,3 +59,17 @@ def test_optimizer_full_run(mock_llm, monkeypatch):
 
     # Assert
     assert "Refined instructions." in optimizer.prompt
+
+
+def test_optimizer_invalid_scorer_name():
+    """Test that a ValueError is raised for a non-existent scorer."""
+    # Arrange
+    optimizer = PromptOptimizer(
+        signature=SimpleSignature,
+        initial_prompt="Initial prompt",
+    )
+    dataset = [dspy.Example(input="q1", output="correct").with_inputs("input")]
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="Scorer 'non_existent_scorer' not found in registry."):
+        optimizer.optimize(dataset, scorer="non_existent_scorer")

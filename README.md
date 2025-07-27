@@ -1,6 +1,6 @@
 # DSPy Prompt-Optimizer Framework
 
-A flexible framework that **iteratively improves prompts**-via self-critique and self-repair—until a large-language model (LLM) achieves the desired output on a labelled dataset.
+A flexible framework that **iteratively improves prompts**—via self-critique and self-repair—until a large-language model (LLM) achieves the desired output on a labelled dataset.
 Although the reference implementation targets “amount-excluding-tax” extraction from Dutch invoices, the design is **domain-agnostic**: swap in a new *signature* (I/O schema) and a *base prompt*, and the optimiser will refine prompts for *any* task—information extraction, classification, transformation, or reasoning.
 
 ---
@@ -131,49 +131,45 @@ The optimiser will reuse the same evaluator/refiner/merger logic; only the I/O s
 
 ---
 
+## 7. Features & Roadmap
 
+### ✨ Implemented Features
 
-### Happy automating your prompt engineering 🚀
+- [x] **Core Architecture:**
+    - [x] Modular `Evaluator` -> `Refiner` -> `Validator` -> `Merger` loop.
+    - [x] Pluggable strategies for `Merger`, `Validation`, and `Scoring`.
+    - [x] Decorator-based `Registry` for auto-discovery of strategies.
+    - [x] Extensible `Callback` system for logging and auditing.
+- [x] **Strategies & Callbacks:**
+    - [x] `BlockBasedMerger` for structured prompt updates.
+    - [x] `FullValidationStrategy` and `BatchedTrainingSetValidationStrategy`.
+    - [x] `HistoryCallback` for detailed local logging.
+    - [x] `MLflowCallback` for experiment tracking.
+- [x] **Refiner Enhancements:**
+    - [x] "Simple History" to prevent the `Refiner` from repeating failed suggestions.
+- [x] **Project Tooling:**
+    - [x] Full project setup with `uv`, `pytest`, `ruff`, and `pre-commit`.
+    - [x] Comprehensive unit and integration test suite.
+    - [x] Complete, end-to-end example (`dutch_invoices`).
 
+### 🗺️ Roadmap
+
+- [ ] **Phase 4: Final Touches & Documentation**
+    - [ ] Implement `SingleExampleValidationStrategy`.
+    - [ ] Write comprehensive docstrings and type hints for the public API.
+    - [ ] Update `README.md` with new features and usage examples.
+- [ ] **Phase 5: Future Enhancements**
+    - [ ] **Refiner & History:**
+        - [ ] Implement "Rich History" for the Refiner, including failed reasoning and outputs.
+        - [ ] Implement Multi-LLM Refiner for advanced reasoning (e.g., GPT-4 for reflection, Haiku for generation).
+    - [ ] **Optimization & Validation:**
+        - [ ] Add support for batched and hybrid optimization modes.
+        - [ ] Implement Human-in-the-Loop (HITL) Validation Strategy.
+        - [ ] Implement Automated Example Generation to harden prompts.
+    - [ ] **Strategies:**
+        - [ ] Implement Advanced Patch Strategies (e.g., `LineBasedMerger`).
+        - [ ] Implement Sophisticated Scoring (e.g., LLM-as-a-judge).
 
 ---
 
-## 7. Project Roadmap
-
-This project will be developed iteratively. Here is the planned roadmap.
-
-### Core MVP (v0.1)
-
-The initial version will focus on delivering a fully functional, robust, and extensible optimization framework.
-
-- [x] **Foundations:**
-    - [x] Implement the core directory structure.
-    - [x] Define all data models (`PromptPatch`, `Config`) and strategy interfaces (`ValidationStrategy`, `MergerStrategy`, `Callback`).
-    - [x] Implement the decorator-based `Registry` for auto-discovery.
-- [ ] **Core Components:**
-    - [x] Implement the `Evaluator` module.
-    - [x] Implement the `Refiner` module.
-    - [ ] Implement the `PromptOptimiser` orchestrator.
-    - [ ] Implement the default `BlockBasedMerger`.
-    - [ ] Implement the `FullValidationStrategy` and `BatchedTrainingSetValidationStrategy`.
-    - [ ] Implement a default `HistoryCallback` for auditing.
-- [ ] **Usability & Quality:**
-    - [ ] Provide a complete, working example for the Dutch Invoices use case.
-    - [ ] Write comprehensive docstrings and type hints for the public API.
-    - [ ] Achieve high unit test coverage with `pytest`.
-
-### Future Enhancements (Post-v0.1)
-
-Once the core is stable, we will explore more advanced features.
-
-- [ ] **Advanced Strategies:**
-    - [ ] Implement an `LLMPoweredMerger`.
-    - [ ] Implement a `CanarySetValidationStrategy`.
-    - [ ] Implement an `LLMAsJudgeValidationStrategy` for subjective tasks.
-- [ ] **Integrations:**
-    - [ ] Add a built-in `MLflowCallback` for seamless experiment tracking.
-    - [ ] Add a built-in `WandbCallback`.
-- [ ] **Developer Experience:**
-    - [ ] Develop a more expressive, `dplyr`-style composable API for defining optimization pipelines.
-- [ ] **Performance:**
-    - [ ] Investigate performance optimizations for the validation loop.
+### Happy automating your prompt engineering 🚀

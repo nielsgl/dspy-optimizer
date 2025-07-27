@@ -34,28 +34,29 @@ To provide a detailed audit trail and allow for easy integration with tools like
 
 ### 3.2. The Refiner
 - The `Refiner` module is responsible for proposing improvements to the prompt.
-- **Internal Logic:** It will feature a sophisticated internal reasoning loop. When it encounters a failed example, it can iteratively try different heuristics to find one that works.
-- **External Interface:** Despite its complex internal logic, the `Refiner`'s final output will be a simple, structured `PromptPatch` object. This object is a command that describes the change to be made (e.g., "Append this text to the '### Heuristics' block").
+- **Internal Logic:** It uses a sophisticated `dspy.Signature` that includes few-shot examples to guide the LLM. It is provided with rich context, including the original prompt, the failing example, the model's flawed reasoning, the incorrect prediction, the expected output, and a history of previously failed suggestions for the same example.
+- **External Interface:** The `Refiner`'s final output is a `dspy.Prediction` object containing a structured patch (target block, operation, and content) ready for the `Merger`.
 
 ### 3.3. The Merger
-- The `Merger` is responsible for applying a `PromptPatch` to the main prompt.
-- The default implementation will be a `BlockBasedMerger`, which deterministically applies the patch to the specified block in the prompt. This is safe and predictable.
+- The `Merger` is responsible for applying a patch to the main prompt.
+- The default implementation is a `BlockBasedMerger`, which deterministically applies the patch to the specified block in the prompt. This is safe and predictable.
 - The pluggable strategy design allows for more complex, LLM-powered mergers to be added in the future.
 
 ### 3.4. The Validator
 - The `Validator` is responsible for checking a new candidate prompt for regressions.
-- The system will ship with two initial strategies to allow users to manage the speed-vs-safety trade-off:
+- The system ships with multiple strategies to allow users to manage the speed-vs-safety trade-off:
     1.  **`FullValidationStrategy` (Default):** The safest option. After every proposed merge, it runs the candidate prompt against a full, separate validation set.
     2.  **`BatchedTrainingSetValidationStrategy`:** A faster option. It validates a new prompt against the training set after a batch of `k` refinements.
+    3.  **`SingleExampleValidationStrategy`:** The fastest option, ideal for rapid development. It validates a candidate prompt only against the single example that triggered the refinement.
 
 ### 3.5. The Scorer
 - The scoring logic is fully user-defined to make the framework domain-agnostic.
 - The user will provide a `scorer` function to the optimizer. This function takes a `dspy.Example` (with the gold label) and a `dspy.Prediction` and returns `True` or `False`.
-- The interface will be designed to be compatible with standard metrics from libraries like DSPy.
+- The interface is designed to be compatible with standard metrics from libraries like DSPy.
 
 ## 4. Directory Structure
 
-The project will follow a conventional Python library structure to enhance maintainability and usability.
+The project follows a conventional Python library structure to enhance maintainability and usability.
 
 ```
 dspy_optimizer/           # The main library source code
@@ -73,7 +74,8 @@ dspy_optimizer/           # The main library source code
     ├── validation/
     │   ├── base.py       # ValidationStrategy interface
     │   ├── full.py
-    │   └── batched.py
+    │   ├── batched.py
+    │   └── single_example.py
     └── scoring/
         ├── base.py       # Scorer function type definition
         └── common.py     # Common scorers (numeric, exact_match)

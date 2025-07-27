@@ -1,5 +1,7 @@
 """Common, reusable scorer functions."""
 
+from typing import Any
+
 import dspy
 
 from dspy_optimizer.strategies.registry import scorers
@@ -71,10 +73,19 @@ def numeric_scorer(
 
     # 2. Extract and parse the values.
     try:
-        expected_value_str = str(getattr(example, output_key)).replace(",", "")
-        predicted_value_str = str(prediction[output_key]).replace(",", "")
-        expected_float = float(expected_value_str)
-        predicted_float = float(predicted_value_str)
+        # A more robust parser for different number formats
+        def parse_numeric(value: Any) -> float:
+            s = str(value).strip()
+            # Handle thousands separators (both comma and period)
+            s = s.replace(".", "")
+            # Handle decimal comma
+            s = s.replace(",", ".")
+            return float(s)
+
+        expected_value = getattr(example, output_key)
+        print(f"      Expected Value: {expected_value} (type: {type(expected_value)})")
+        expected_float = parse_numeric(expected_value)
+        predicted_float = parse_numeric(prediction[output_key])
     except (AttributeError, KeyError, ValueError, TypeError):
         return False
 

@@ -26,7 +26,6 @@ class SingleExampleValidationStrategy(ValidationStrategy):
         evaluator: dspy.Module,
         scorer: Callable,
         dataset: list[dspy.Example],
-        example: dspy.Example,
         **kwargs,
     ) -> bool:
         """
@@ -37,16 +36,17 @@ class SingleExampleValidationStrategy(ValidationStrategy):
             evaluator: The dspy.Module used for evaluation.
             scorer: The scoring function to determine correctness.
             dataset: The full dataset (ignored by this strategy).
-            example: The specific dspy.Example that failed with the original prompt.
+            **kwargs: Must contain the 'example' that failed.
 
         Returns:
             True if the candidate prompt correctly handles the failing example,
             False otherwise.
         """
-        # Create a temporary evaluator with the new prompt
-        with dspy.context(lm=evaluator.lm):
-            temp_evaluator = evaluator.with_signature(dspy.Predict(evaluator.signature))
-            temp_evaluator.prompt = candidate_prompt
+        example = kwargs.get("example")
+        if example is None:
+            raise ValueError("SingleExampleValidationStrategy requires 'example' in kwargs.")
 
-        prediction = temp_evaluator(**example.inputs())
+        # The evaluator is a dspy.Predict module; we can override its prompt for one call.
+        # This will automatically use any LM set in the surrounding dspy.context.
+        prediction = evaluator(prompt=candidate_prompt, **example.inputs())
         return scorer(example, prediction)

@@ -63,3 +63,32 @@ def mock_llm() -> MockLLM:
     llm = MockLLM()
     dspy.settings.configure(lm=llm)
     return llm
+
+
+@pytest.fixture
+def mock_evaluator(mock_llm: MockLLM) -> dspy.Module:
+    """A pytest fixture that provides a mock evaluator."""
+
+    class MockPredict(dspy.Module):
+        def __init__(self):
+            super().__init__()
+            self.predictor = dspy.Predict("text -> label")
+
+        def forward(self, text, prompt=None):
+            if prompt and "fail" in prompt:
+                return dspy.Prediction(label="fail")
+            if "fail" in text:
+                return dspy.Prediction(label="fail")
+            return dspy.Prediction(label="pass")
+
+    return MockPredict()
+
+
+@pytest.fixture
+def mock_scorer():
+    """A pytest fixture that provides a simple mock scorer."""
+
+    def scorer(example, prediction):
+        return example.label == prediction.label
+
+    return scorer

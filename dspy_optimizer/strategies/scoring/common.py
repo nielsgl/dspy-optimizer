@@ -84,7 +84,6 @@ def numeric_scorer(
             return float(s)
 
         expected_value = getattr(example, output_key)
-        print(f"      Expected Value: {expected_value} (type: {type(expected_value)})")
         expected_float = parse_numeric(expected_value)
         predicted_float = parse_numeric(prediction[output_key])
     except (AttributeError, KeyError, ValueError, TypeError):

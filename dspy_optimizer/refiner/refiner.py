@@ -41,9 +41,6 @@ class Refiner(dspy.Module):
             A dspy.Prediction object containing the analysis, suggestion,
             and the proposed patch.
         """
-        print("---in refiner")
-        print(f"{expected_output=}, {type(expected_output)=}")
-        print(f"{prediction=}, {type(prediction)=}")
         return self._predictor(
             prompt=prompt,
             example=example,

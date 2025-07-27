@@ -76,9 +76,10 @@ def numeric_scorer(
         # A more robust parser for different number formats
         def parse_numeric(value: Any) -> float:
             s = str(value).strip()
-            # Handle thousands separators (both comma and period)
-            s = s.replace(".", "")
-            # Handle decimal comma
+            # Handle thousands separators (both comma and period) by removing them
+            s = s.replace(",", "")
+            # Handle decimal comma by replacing it with a period
+            # This is safe because all commas have been removed
             s = s.replace(",", ".")
             return float(s)
 

@@ -18,16 +18,37 @@ class Refiner(dspy.Module):
         super().__init__()
         self._predictor = dspy.ChainOfThought(RefinerSignature)
 
-    def forward(self, prompt: str, example: dspy.Example, error: str) -> dspy.Prediction:
+    def forward(
+        self,
+        prompt: str,
+        example: dspy.Example,
+        error_reasoning: str,
+        prediction: str,
+        expected_output: str,
+        history: list[str],
+    ) -> dspy.Prediction:
         """Analyzes the prompt and proposes a refined version.
 
         Args:
             prompt: The original prompt that needs to be improved.
             example: The dspy.Example that caused the prompt to fail.
-            error: A description of the error.
+            error_reasoning: The flawed reasoning from the model.
+            prediction: The incorrect final prediction from the model.
+            expected_output: The correct output that was expected.
+            history: A list of previously attempted suggestions that have failed.
 
         Returns:
             A dspy.Prediction object containing the analysis, suggestion,
-            and the full text of the modified prompt.
+            and the proposed patch.
         """
-        return self._predictor(prompt=prompt, example=example, error=error)
+        print("---in refiner")
+        print(f"{expected_output=}, {type(expected_output)=}")
+        print(f"{prediction=}, {type(prediction)=}")
+        return self._predictor(
+            prompt=prompt,
+            example=example,
+            error_reasoning=error_reasoning,
+            prediction=prediction,
+            expected_output=expected_output,
+            history=str(history),  # Pass history as a string for the LLM
+        )
